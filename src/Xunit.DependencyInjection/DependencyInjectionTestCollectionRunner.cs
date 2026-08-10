@@ -139,6 +139,7 @@ public class DependencyInjectionTestCollectionRunner(
         try
         {
             ctxt.CollectionFixtureMappings.ClearFixtures(ctxt.TestCollection.CollectionFixtureTypes, disposable.ServiceProvider);
+
             return await base.OnTestCollectionFinished(ctxt, summary);
         }
         finally

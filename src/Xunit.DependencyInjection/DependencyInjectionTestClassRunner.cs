@@ -47,6 +47,7 @@ public class DependencyInjectionTestClassRunner(DependencyInjectionTestContext c
         try
         {
             ctxt.ClassFixtureMappings.ClearFixtures(ctxt.TestClass.ClassFixtureTypes, disposable.ServiceProvider);
+
             return await base.OnTestClassFinished(ctxt, summary);
         }
         finally
