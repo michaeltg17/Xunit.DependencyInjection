@@ -48,7 +48,7 @@ internal class DependencyInjectionTestAssemblyRunner(
         if (context.DefaultRootServices != null)
             ctxt.AssemblyFixtureMappings.ClearFixtures(ctxt.TestAssembly.AssemblyFixtureTypes,
                 context.DefaultRootServices);
-        
+
         try
         {
             await hostManager.StopAsync(ctxt.CancellationTokenSource.Token);
