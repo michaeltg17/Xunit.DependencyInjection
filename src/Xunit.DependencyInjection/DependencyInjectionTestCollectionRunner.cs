@@ -131,13 +131,14 @@ public class DependencyInjectionTestCollectionRunner(
     protected override async ValueTask<bool> OnTestCollectionFinished(DependencyInjectionTestCollectionRunnerContext ctxt,
         RunSummary summary)
     {
+        DependencyInjectionContext.Fixtures.SetCollection(null);
+
         if (_serviceScope is not { } disposable)
             return await base.OnTestCollectionFinished(ctxt, summary);
 
         try
         {
             ctxt.CollectionFixtureMappings.ClearFixtures(ctxt.TestCollection.CollectionFixtureTypes, disposable.ServiceProvider);
-
             return await base.OnTestCollectionFinished(ctxt, summary);
         }
         finally

@@ -43,11 +43,12 @@ internal class DependencyInjectionTestAssemblyRunner(
     protected override async ValueTask<bool> OnTestAssemblyFinished(DependencyInjectionAssemblyRunnerContext ctxt,
         RunSummary summary)
     {
+        DependencyInjectionContext.Fixtures.SetAssembly(null);
+
         if (context.DefaultRootServices != null)
             ctxt.AssemblyFixtureMappings.ClearFixtures(ctxt.TestAssembly.AssemblyFixtureTypes,
                 context.DefaultRootServices);
-        DependencyInjectionContext.Fixtures.SetAssembly(null);
-
+        
         try
         {
             await hostManager.StopAsync(ctxt.CancellationTokenSource.Token);

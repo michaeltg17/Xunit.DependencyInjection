@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Xunit.DependencyInjection;
@@ -12,7 +11,6 @@ public class DependencyInjectionTestRunner(
 {
     private static readonly ConcurrentDictionary<Type, PropertyInfo[]> HasRequiredMembers = [];
 
-    [SuppressMessage("Style", "IDE0045:Convert to conditional expression", Justification = "Cleaner")]
     protected override async
         ValueTask<(object? Instance, SynchronizationContext? SyncContext, ExecutionContext? ExecutionContext)>
         CreateTestClassInstance(XunitTestRunnerContext ctxt)
@@ -50,11 +48,9 @@ public class DependencyInjectionTestRunner(
         !testClass.HasRequiredMemberAttribute() || testClass.GetConstructors().FirstOrDefault(static ci =>
             ci is { IsStatic: false, IsPublic: true }) is not { } ci || ci.HasSetsRequiredMembersAttribute()
             ? []
-            : [.. testClass.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Where(static p => p.DeclaringType != typeof(object) &&
-                                   p.SetMethod is { IsPublic: true } &&
-                                   p.HasRequiredMemberAttribute() &&
-                                   p.GetMethod is not null)];
+            : testClass.GetProperties()
+                .Where(p => p.SetMethod is { IsPublic: true } && p.HasRequiredMemberAttribute())
+                .ToArray();
 
     protected override async ValueTask<TimeSpan> RunTest(XunitTestRunnerContext ctxt)
     {
