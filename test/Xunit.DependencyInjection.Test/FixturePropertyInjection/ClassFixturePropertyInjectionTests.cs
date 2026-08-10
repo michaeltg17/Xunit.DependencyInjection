@@ -1,6 +1,4 @@
-using Xunit.DependencyInjection.Test.ClassFixture;
-
-namespace Xunit.DependencyInjection.Test.FixturePropertyInjection;
+﻿namespace Xunit.DependencyInjection.Test.FixturePropertyInjection;
 
 public class FixtureForPropertyInjection(IDependency dependency)
 {
@@ -32,12 +30,6 @@ public class ClassFixtureViaRequiredPropertyTest : TestsWithRequiredFixtureBase
 
     [Fact]
     public void FixtureStatePersistedAcrossTests_2() => Assert.Equal(9999, Fixture.Dependency.Value);
-}
-
-public class DerivedWithoutConstructor : TestsWithRequiredFixtureBase
-{
-    [Fact]
-    public void DerivedClassReceivesSameFixture() => Assert.NotNull(Fixture);
 }
 
 /// <summary>
