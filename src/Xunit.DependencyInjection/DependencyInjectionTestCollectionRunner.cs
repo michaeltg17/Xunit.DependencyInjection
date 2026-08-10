@@ -131,20 +131,19 @@ public class DependencyInjectionTestCollectionRunner(
     protected override async ValueTask<bool> OnTestCollectionFinished(DependencyInjectionTestCollectionRunnerContext ctxt,
         RunSummary summary)
     {
-        if (_serviceScope is { } disposable)
-        {
-            try
-            {
-                ctxt.CollectionFixtureMappings.ClearFixtures(ctxt.TestCollection.CollectionFixtureTypes, disposable.ServiceProvider);
+        if (_serviceScope is not { } disposable)
+            return await base.OnTestCollectionFinished(ctxt, summary);
 
-                return await base.OnTestCollectionFinished(ctxt, summary);
-            }
-            finally
-            {
-                await disposable.DisposeAsync();
-            }
+        try
+        {
+            ctxt.CollectionFixtureMappings.ClearFixtures(ctxt.TestCollection.CollectionFixtureTypes, disposable.ServiceProvider);
+
+            return await base.OnTestCollectionFinished(ctxt, summary);
         }
-        return await base.OnTestCollectionFinished(ctxt, summary);
+        finally
+        {
+            await disposable.DisposeAsync();
+        }
     }
 
     protected override ValueTask<RunSummary> RunTestClass(DependencyInjectionTestCollectionRunnerContext ctxt,

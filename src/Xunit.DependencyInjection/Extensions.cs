@@ -22,8 +22,7 @@ internal static class Extensions
     extension(PropertyInfo propertyInfo)
     {
         public bool HasRequiredMemberAttribute() => propertyInfo.CustomAttributes.Any(
-            cad => cad.AttributeType.FullName == "System.Runtime.CompilerServices.RequiredMemberAttribute"
-               || cad.AttributeType.FullName == "System.Runtime.CompilerServices.RequiredAttribute");
+            cad => cad.AttributeType.FullName == "System.Runtime.CompilerServices.RequiredMemberAttribute");
     }
 
     extension(ConstructorInfo constructorInfo)

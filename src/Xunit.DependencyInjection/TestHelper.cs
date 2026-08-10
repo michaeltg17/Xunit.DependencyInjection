@@ -46,18 +46,11 @@ internal static class TestHelper
         public IDictionary<Type, object> GetFixtureCache()
         {
             var field =
-                typeof(FixtureMappingManager).GetField("fixtureCache", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic) ??
+                typeof(FixtureMappingManager).GetField("fixtureCache", BindingFlags.Instance | BindingFlags.NonPublic) ??
                 throw new NotSupportedException("Not found `fixtureCache` field in FixtureMappingManager");
 
-            var cache = field.GetValue(manager) as Dictionary<Type, object> ??
+            return field.GetValue(manager) as Dictionary<Type, object> ??
                 throw new NotSupportedException("`fixtureCache` is not a Dictionary<Type, object>");
-            return cache;
-        }
-
-        public bool TryGetFixture(Type fixtureType, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out object instance)
-        {
-            var fixtureCache = manager.GetFixtureCache();
-            return fixtureCache.TryGetValue(fixtureType, out instance);
         }
 
         public async ValueTask CreateFixtures(IReadOnlyCollection<Type> fixtureTypes, ExceptionAggregator aggregator, IServiceProvider provider)
