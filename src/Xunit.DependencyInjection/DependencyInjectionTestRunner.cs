@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Xunit.DependencyInjection;
@@ -11,6 +12,7 @@ public class DependencyInjectionTestRunner(
 {
     private static readonly ConcurrentDictionary<Type, PropertyInfo[]> HasRequiredMembers = [];
 
+    [SuppressMessage("Style", "IDE0045:Convert to conditional expression", Justification = "Cleaner")]
     protected override async
         ValueTask<(object? Instance, SynchronizationContext? SyncContext, ExecutionContext? ExecutionContext)>
         CreateTestClassInstance(XunitTestRunnerContext ctxt)
