@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Xunit.DependencyInjection;
@@ -11,6 +12,7 @@ public class DependencyInjectionTestRunner(
 {
     private static readonly ConcurrentDictionary<Type, PropertyInfo[]> HasRequiredMembers = [];
 
+    [SuppressMessage("Style", "IDE0045:Convert to conditional expression", Justification = "Cleaner")]
     protected override async
         ValueTask<(object? Instance, SynchronizationContext? SyncContext, ExecutionContext? ExecutionContext)>
         CreateTestClassInstance(XunitTestRunnerContext ctxt)
@@ -27,11 +29,19 @@ public class DependencyInjectionTestRunner(
         var provider = ((DependencyInjectionTestRunnerContext)ctxt).Provider;
 
         foreach (var propertyInfo in properties)
-            propertyInfo.SetValue(testClassInstance, propertyInfo.PropertyType == typeof(ITestOutputHelper)
-                ? TestContext.Current.TestOutputHelper
-                : propertyInfo.PropertyType == typeof(CancellationToken)
-                    ? ctxt.CancellationTokenSource.Token
-                    : provider.GetRequiredService(propertyInfo.PropertyType));
+        {
+            object? value;
+            if (propertyInfo.PropertyType == typeof(ITestOutputHelper))
+                value = TestContext.Current.TestOutputHelper;
+            else if (propertyInfo.PropertyType == typeof(CancellationToken))
+                value = ctxt.CancellationTokenSource.Token;
+            else if (DependencyInjectionContext.Fixtures.TryGet(propertyInfo.PropertyType, out var fixture))
+                value = fixture;
+            else
+                value = provider.GetRequiredService(propertyInfo.PropertyType);
+
+            propertyInfo.SetValue(testClassInstance, value);
+        }
 
         return (testClassInstance, syncContext, executionContext);
     }
@@ -40,9 +50,11 @@ public class DependencyInjectionTestRunner(
         !testClass.HasRequiredMemberAttribute() || testClass.GetConstructors().FirstOrDefault(static ci =>
             ci is { IsStatic: false, IsPublic: true }) is not { } ci || ci.HasSetsRequiredMembersAttribute()
             ? []
-            : testClass.GetProperties()
-                .Where(p => p.SetMethod is { IsPublic: true } && p.HasRequiredMemberAttribute())
-                .ToArray();
+            : [.. testClass.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Where(static p => p.DeclaringType != typeof(object) &&
+                                   p.SetMethod is { IsPublic: true } &&
+                                   p.HasRequiredMemberAttribute() &&
+                                   p.GetMethod is not null)];
 
     protected override async ValueTask<TimeSpan> RunTest(XunitTestRunnerContext ctxt)
     {

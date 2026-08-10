@@ -30,6 +30,8 @@ public class DependencyInjectionTestClassRunner(DependencyInjectionTestContext c
 
             await ctxt.ClassFixtureMappings.CreateFixtures(ctxt.TestClass.ClassFixtureTypes, ctxt.Aggregator,
                 serviceScope.ServiceProvider);
+
+            DependencyInjectionContext.Fixtures.SetClass(ctxt.ClassFixtureMappings.GetFixtureCache());
         }
 
         return await base.OnTestClassStarting(ctxt);
@@ -37,19 +39,20 @@ public class DependencyInjectionTestClassRunner(DependencyInjectionTestContext c
 
     protected override async ValueTask<bool> OnTestClassFinished(XunitTestClassRunnerContext ctxt, RunSummary summary)
     {
-        if (_serviceScope is not { } disposable)
-            return await base.OnTestClassFinished(ctxt, summary);
-
-        try
+        if (_serviceScope is { } disposable)
         {
-            ctxt.ClassFixtureMappings.ClearFixtures(ctxt.TestClass.ClassFixtureTypes, disposable.ServiceProvider);
+            try
+            {
+                ctxt.ClassFixtureMappings.ClearFixtures(ctxt.TestClass.ClassFixtureTypes, disposable.ServiceProvider);
 
-            return await base.OnTestClassFinished(ctxt, summary);
+                return await base.OnTestClassFinished(ctxt, summary);
+            }
+            finally
+            {
+                await disposable.DisposeAsync();
+            }
         }
-        finally
-        {
-            await disposable.DisposeAsync();
-        }
+        return await base.OnTestClassFinished(ctxt, summary);
     }
 
     // This method has been slightly modified from the original implementation to run tests in parallel

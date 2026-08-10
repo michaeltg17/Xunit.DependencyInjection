@@ -30,8 +30,11 @@ internal class DependencyInjectionTestAssemblyRunner(
             if (context.DefaultRootServices == null)
                 ctxt.Aggregator.Add(HostManager.MissingDefaultHost("Assembly fixture require a default startup."));
             else
+            {
                 await ctxt.AssemblyFixtureMappings.CreateFixtures(ctxt.TestAssembly.AssemblyFixtureTypes,
                     ctxt.Aggregator, context.DefaultRootServices);
+                DependencyInjectionContext.Fixtures.SetAssembly(ctxt.AssemblyFixtureMappings.GetFixtureCache());
+            }
         }
 
         return await base.OnTestAssemblyStarting(ctxt);
@@ -43,6 +46,7 @@ internal class DependencyInjectionTestAssemblyRunner(
         if (context.DefaultRootServices != null)
             ctxt.AssemblyFixtureMappings.ClearFixtures(ctxt.TestAssembly.AssemblyFixtureTypes,
                 context.DefaultRootServices);
+        DependencyInjectionContext.Fixtures.SetAssembly(null);
 
         try
         {
