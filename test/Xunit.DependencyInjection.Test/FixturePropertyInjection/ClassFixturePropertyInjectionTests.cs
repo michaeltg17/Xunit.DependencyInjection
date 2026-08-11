@@ -1,11 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using static Xunit.DependencyInjection.Test.FixturePropertyInjection.Fixtures;
 
 namespace Xunit.DependencyInjection.Test.FixturePropertyInjection;
-
-public class FixtureForClass(IDependency dependency)
-{
-    public IDependency Dependency { get; } = dependency;
-}
 
 /// <summary>
 /// Base class declares required property; derived classes have no boilerplate constructors.

@@ -1,9 +1,6 @@
-﻿namespace Xunit.DependencyInjection.Test.FixturePropertyInjection;
+﻿using static Xunit.DependencyInjection.Test.FixturePropertyInjection.Fixtures;
 
-public class FixtureForCollection(IDependency dependency)
-{
-    public IDependency Dependency { get; } = dependency;
-}
+namespace Xunit.DependencyInjection.Test.FixturePropertyInjection;
 
 /// <summary>
 /// Collection-level fixture with required property injection.

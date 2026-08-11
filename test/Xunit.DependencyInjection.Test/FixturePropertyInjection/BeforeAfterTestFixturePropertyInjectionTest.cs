@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using static Xunit.DependencyInjection.Test.FixturePropertyInjection.Fixtures;
 
 namespace Xunit.DependencyInjection.Test.FixturePropertyInjection;
 

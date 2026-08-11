@@ -1,39 +1,20 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Xunit;
-using Xunit.DependencyInjection.Test.FixturePropertyInjection;
+using static Xunit.DependencyInjection.Test.FixturePropertyInjection.Fixtures;
 
-[assembly: AssemblyFixture(typeof(FixtureForAssemblyMixed))]
+[assembly: AssemblyFixture(typeof(FixtureForAssembly))]
 namespace Xunit.DependencyInjection.Test.FixturePropertyInjection;
 
-/// <summary>
-/// Fixture types declared for mixed scope injection tests.
-/// Each is a unique type so FixtureCache.TryGet resolves by exact type.
-/// </summary>
-public class FixtureForAssemblyMixed(IDependency dependency)
-{
-    public IDependency Dependency { get; } = dependency;
-}
-
-public class FixtureForCollectionMixed(IDependency dependency)
-{
-    public IDependency Dependency { get; } = dependency;
-}
-
-public class FixtureForClassMixed(IDependency dependency)
-{
-    public IDependency Dependency { get; } = dependency;
-}
-
 [CollectionDefinition(nameof(MixedCollectionFixtures))]
-public class MixedCollectionFixtures : ICollectionFixture<FixtureForCollectionMixed>;
+public class MixedCollectionFixtures : ICollectionFixture<FixtureForCollection>;
 
 [Collection(nameof(MixedCollectionFixtures))]
 [SuppressMessage("Usage", "xUnit1033:Test classes decorated with 'Xunit.IClassFixture<TFixture>' or 'Xunit.ICollectionFixture<TFixture>' should add a constructor argument of type TFixture", Justification = "Injected via DI")]
-public class MixedFixturePropertyTest : IClassFixture<FixtureForClassMixed>
+public class MixedFixturePropertyTest : IClassFixture<FixtureForClass>
 {
-    public required FixtureForAssemblyMixed AssemblyFixture { get; set; }
-    public required FixtureForCollectionMixed CollectionFixture { get; set; }
-    public required FixtureForClassMixed ClassFixture { get; set; }
+    public required FixtureForAssembly AssemblyFixture { get; set; }
+    public required FixtureForCollection CollectionFixture { get; set; }
+    public required FixtureForClass ClassFixture { get; set; }
 
     [Fact]
     public void AssemblyFixtureResolved() => Assert.NotNull(AssemblyFixture);

@@ -1,13 +1,9 @@
-﻿using Xunit.DependencyInjection.Test.FixturePropertyInjection;
+﻿using Xunit;
+using static Xunit.DependencyInjection.Test.FixturePropertyInjection.Fixtures;
 
-[assembly: Xunit.AssemblyFixture(typeof(FixtureForAssembly))]
+[assembly: AssemblyFixture(typeof(FixtureForAssembly))]
 
 namespace Xunit.DependencyInjection.Test.FixturePropertyInjection;
-
-public class FixtureForAssembly(IDependency dependency)
-{
-    public IDependency Dependency { get; } = dependency;
-}
 
 /// <summary>
 /// Assembly-level fixture with required property injection.
