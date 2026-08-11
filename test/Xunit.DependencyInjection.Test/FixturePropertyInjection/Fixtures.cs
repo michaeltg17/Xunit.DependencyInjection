@@ -2,18 +2,12 @@
 
 public static class Fixtures
 {
-    public class FixtureForAssembly(IDependency dependency)
+    public abstract class Fixture(IDependency dependency)
     {
         public IDependency Dependency { get; } = dependency;
     }
 
-    public class FixtureForCollection(IDependency dependency)
-    {
-        public IDependency Dependency { get; } = dependency;
-    }
-
-    public class FixtureForClass(IDependency dependency)
-    {
-        public IDependency Dependency { get; } = dependency;
-    }
+    public class FixtureForAssembly(IDependency dependency) : Fixture(dependency) { }
+    public class FixtureForCollection(IDependency dependency) : Fixture(dependency) { }
+    public class FixtureForClass(IDependency dependency) : Fixture(dependency) { }
 }
