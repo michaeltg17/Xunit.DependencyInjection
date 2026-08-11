@@ -4,8 +4,12 @@ namespace Xunit.DependencyInjection;
 
 public class DependencyInjectionContext(IHost host, bool disableParallelization)
 {
-    /// <summary>Thread-static accessor for fixture cache, reachable from any runner regardless of context type.</summary>
-    [field: ThreadStatic] internal static FixtureCache Fixtures { get => field ??= new(); private set; }
+    private static readonly AsyncLocal<FixtureCache?> AsyncLocalFixtures = new();
+
+    /// <summary>
+    /// Per-collection fixture cache via AsyncLocal. Falls back to shared static for assembly fixtures.
+    /// </summary>
+    internal static FixtureCache Fixtures => AsyncLocalFixtures.Value ?? FixtureCache.AssemblySharedFixtures;
 
     public IHost Host { get; } = host;
 
@@ -15,29 +19,33 @@ public class DependencyInjectionContext(IHost host, bool disableParallelization)
 }
 
 /// <summary>
-/// Holds references to fixtures from class, collection, and assembly scopes,
-/// threaded via ThreadStatic so that <c>[Required]</c> property injection and
-/// <c>BeforeAfterTest</c> in the per-test scope can resolve already-created fixtures
-/// without crossing DI scope boundaries.
+/// Holds fixture instances for resolving <c>[Required]</c> properties.
+/// Assembly fixtures are shared via a static field; collection/class are per-runner via AsyncLocal,
+/// so that parallel collections get their own isolation for collection/class fixtures while
+/// assembly fixtures are visible from all threads.
 /// </summary>
 public sealed class FixtureCache
 {
-    IDictionary<Type, object>? _assembly;
+    /// <summary>Shared across all threads for assembly fixtures — set by assembly runner.</summary>
+    internal static readonly FixtureCache AssemblySharedFixtures = new();
+    private IDictionary<Type, object>? _assembly;
+
     IDictionary<Type, object>? _collection;
     IDictionary<Type, object>? _class;
 
-    internal void SetAssembly(IDictionary<Type, object>? fixtures) => _assembly = fixtures;
+    /// <summary>Always writes to the shared assembly fixtures.</summary>
+    internal static void SetAssembly(IDictionary<Type, object>? fixtures) => AssemblySharedFixtures._assembly = fixtures;
     internal void SetCollection(IDictionary<Type, object>? fixtures) => _collection = fixtures;
     internal void SetClass(IDictionary<Type, object>? fixtures) => _class = fixtures;
 
     /// <summary>
     /// Tries to get a fixture instance by type. Priority: class > collection > assembly.
     /// </summary>
-    public bool TryGet(Type fixtureType, [MaybeNullWhen(false)] out object instance)
+    internal bool TryGet(Type fixtureType, [MaybeNullWhen(false)] out object instance)
     {
         if (_class?.TryGetValue(fixtureType, out instance) == true) return true;
         if (_collection?.TryGetValue(fixtureType, out instance) == true) return true;
-        if (_assembly?.TryGetValue(fixtureType, out instance) == true) return true;
+        if (AssemblySharedFixtures._assembly?.TryGetValue(fixtureType, out instance) == true) return true;
         instance = default;
         return false;
     }

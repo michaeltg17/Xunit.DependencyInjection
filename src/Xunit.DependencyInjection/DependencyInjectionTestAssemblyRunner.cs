@@ -33,7 +33,7 @@ internal class DependencyInjectionTestAssemblyRunner(
             {
                 await ctxt.AssemblyFixtureMappings.CreateFixtures(ctxt.TestAssembly.AssemblyFixtureTypes,
                     ctxt.Aggregator, context.DefaultRootServices);
-                DependencyInjectionContext.Fixtures.SetAssembly(ctxt.AssemblyFixtureMappings.GetFixtureCache());
+                FixtureCache.SetAssembly(ctxt.AssemblyFixtureMappings.GetFixtureCache());
             }
         }
 
@@ -43,7 +43,7 @@ internal class DependencyInjectionTestAssemblyRunner(
     protected override async ValueTask<bool> OnTestAssemblyFinished(DependencyInjectionAssemblyRunnerContext ctxt,
         RunSummary summary)
     {
-        DependencyInjectionContext.Fixtures.SetAssembly(null);
+        FixtureCache.SetAssembly(null);
 
         if (context.DefaultRootServices != null)
             ctxt.AssemblyFixtureMappings.ClearFixtures(ctxt.TestAssembly.AssemblyFixtureTypes,
