@@ -2,12 +2,12 @@
 
 namespace Xunit.DependencyInjection.Test.FixturePropertyInjection;
 
-/// <summary>
-/// Collection-level fixture with required property injection.
-/// </summary>
 [CollectionDefinition(nameof(CollectionForPropertyInjection))]
 public class CollectionForPropertyInjection : ICollectionFixture<FixtureForCollection>;
 
+/// <summary>
+/// Base class declares required property; derived classes have no boilerplate constructors.
+/// </summary>
 [Collection(nameof(CollectionForPropertyInjection))]
 public abstract class CollectionFixtureViaRequiredBase
 {

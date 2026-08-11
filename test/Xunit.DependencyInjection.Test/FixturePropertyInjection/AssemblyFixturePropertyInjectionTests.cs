@@ -8,7 +8,6 @@ namespace Xunit.DependencyInjection.Test.FixturePropertyInjection;
 /// <summary>
 /// Assembly-level fixture with required property injection.
 /// </summary>
-[TestCaseOrderer(typeof(TestCaseByMethodNameOrderer))]
 public abstract class AssemblyFixtureViaRequiredBase
 {
     public required FixtureForAssembly Fixture { get; set; }

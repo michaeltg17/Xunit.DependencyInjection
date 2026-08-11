@@ -13,7 +13,7 @@ public abstract class TestsWithClassFixtureBase : IClassFixture<FixtureForClass>
 }
 
 [SuppressMessage("Usage", "xUnit1033:Test classes decorated with 'Xunit.IClassFixture<TFixture>' or 'Xunit.ICollectionFixture<TFixture>' should add a constructor argument of type TFixture", Justification = "Injected via DI")]
-public class ClassFixtureViaRequiredPropertyTest : TestsWithClassFixtureBase
+public class ClassFixturePropertyInjectionTests : TestsWithClassFixtureBase
 {
     [Fact]
     public void FixtureIsNotNull() => Assert.NotNull(Fixture);
