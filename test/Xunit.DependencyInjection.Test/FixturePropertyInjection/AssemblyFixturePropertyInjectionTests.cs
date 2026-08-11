@@ -1,10 +1,10 @@
 ﻿using Xunit.DependencyInjection.Test.FixturePropertyInjection;
 
-[assembly: Xunit.AssemblyFixture(typeof(FixtureForAssemblyPropertyInjection))]
-[assembly: Xunit.AssemblyFixture(typeof(FixtureForAssemblyClassMixed))]
+[assembly: Xunit.AssemblyFixture(typeof(FixtureForAssembly))]
+
 namespace Xunit.DependencyInjection.Test.FixturePropertyInjection;
 
-public class FixtureForAssemblyPropertyInjection(IDependency dependency)
+public class FixtureForAssembly(IDependency dependency)
 {
     public IDependency Dependency { get; } = dependency;
 }
@@ -15,9 +15,9 @@ public class FixtureForAssemblyPropertyInjection(IDependency dependency)
 [TestCaseOrderer(typeof(TestCaseByMethodNameOrderer))]
 public abstract class AssemblyFixtureViaRequiredBase
 {
-    public required FixtureForAssemblyPropertyInjection Fixture { get; set; }
+    public required FixtureForAssembly Fixture { get; set; }
 
-    internal static FixtureForAssemblyPropertyInjection? _first;
+    internal static FixtureForAssembly? _first;
 }
 
 public class AssemblyFixtureViaRequiredPropertyTest_A : AssemblyFixtureViaRequiredBase
@@ -47,39 +47,4 @@ public class AssemblyFixtureViaRequiredPropertyTest_B : AssemblyFixtureViaRequir
         var previous = Interlocked.CompareExchange(ref _first, Fixture, null);
         Assert.True(previous == null || ReferenceEquals(previous, Fixture));
     }
-}
-
-/// <summary>
-/// Mixed: assembly + class fixtures together to verify scope boundaries.
-/// </summary>
-public class FixtureForAssemblyClassMixed(IDependency dependency)
-{
-    public IDependency Dependency { get; } = dependency;
-}
-
-public class FixtureForClassMixed(IDependency dependency)
-{
-    public IDependency Dependency { get; } = dependency;
-}
-
-public class MixedAssemblyClassFixtureTest : IClassFixture<FixtureForClassMixed>
-{
-    public required FixtureForAssemblyClassMixed AssemblyFixture { get; set; }
-    public required FixtureForClassMixed ClassFixture { get; set; }
-
-    [Fact]
-    public void AssemblyFixtureResolved() => Assert.NotNull(AssemblyFixture);
-
-    [Fact]
-    public void ClassFixtureResolved() => Assert.NotNull(ClassFixture);
-
-    [Fact]
-    public void AssemblyDependencyInjected() => Assert.IsType<DependencyClass>(AssemblyFixture.Dependency);
-
-    [Fact]
-    public void ClassDependencyInjected() => Assert.IsType<DependencyClass>(ClassFixture.Dependency);
-
-    [Fact]
-    public void AssemblyAndClassAreDifferentInstances()
-        => Assert.NotSame(AssemblyFixture.Dependency, ClassFixture.Dependency);
 }

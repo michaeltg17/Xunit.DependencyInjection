@@ -2,12 +2,9 @@
 
 namespace Xunit.DependencyInjection.Test.FixturePropertyInjection;
 
-/// <summary>
-/// Injects fixture via BeforeAfterTest hook.
-/// </summary>
-public class BeforeAfterFixtureTest : IClassFixture<FixtureForPropertyInjection>, IDisposable
+public class BeforeAfterTestFixturePropertyInjectionTest : IClassFixture<FixtureForClass>, IDisposable
 {
-    public FixtureForPropertyInjection? Fixture { get; set; }
+    public FixtureForClass? Fixture { get; set; }
 
     [Fact]
     public void FixtureInjectedInBefore() => Assert.NotNull(Fixture);
@@ -19,14 +16,14 @@ public class BeforeAfterFixtureInjector : BeforeAfterTest
 {
     public override void Before(object? testClassInstance, MethodInfo method)
     {
-        if (testClassInstance is BeforeAfterFixtureTest test
-            && Fixtures.TryGet(typeof(FixtureForPropertyInjection), out var fixture))
-            test.Fixture = (FixtureForPropertyInjection)fixture;
+        if (testClassInstance is BeforeAfterTestFixturePropertyInjectionTest test
+            && Fixtures.TryGet(typeof(FixtureForClass), out var fixture))
+            test.Fixture = (FixtureForClass)fixture;
     }
 
     public override void After(object? testClassInstance, MethodInfo method)
     {
-        if (testClassInstance is BeforeAfterFixtureTest test)
+        if (testClassInstance is BeforeAfterTestFixturePropertyInjectionTest test)
             test.Fixture = null;
     }
 }
