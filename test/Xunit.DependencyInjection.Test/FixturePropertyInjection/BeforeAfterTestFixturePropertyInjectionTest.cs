@@ -1,7 +1,9 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace Xunit.DependencyInjection.Test.FixturePropertyInjection;
 
+[SuppressMessage("Usage", "xUnit1033:Test classes decorated with 'Xunit.IClassFixture<TFixture>' or 'Xunit.ICollectionFixture<TFixture>' should add a constructor argument of type TFixture", Justification = "Set via BeforeAfterTest")]
 public class BeforeAfterTestFixturePropertyInjectionTest : IClassFixture<FixtureForClass>, IDisposable
 {
     public FixtureForClass? Fixture { get; set; }
@@ -9,7 +11,11 @@ public class BeforeAfterTestFixturePropertyInjectionTest : IClassFixture<Fixture
     [Fact]
     public void FixtureInjectedInBefore() => Assert.NotNull(Fixture);
 
-    public void Dispose() => Assert.Null(Fixture);
+    public void Dispose()
+    {
+        Assert.Null(Fixture);
+        GC.SuppressFinalize(this);
+    }
 }
 
 public class BeforeAfterFixtureInjector : BeforeAfterTest

@@ -1,4 +1,6 @@
-﻿namespace Xunit.DependencyInjection.Test.FixturePropertyInjection;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Xunit.DependencyInjection.Test.FixturePropertyInjection;
 
 public class FixtureForClass(IDependency dependency)
 {
@@ -14,6 +16,7 @@ public abstract class TestsWithClassFixtureBase : IClassFixture<FixtureForClass>
     public required FixtureForClass Fixture { get; set; }
 }
 
+[SuppressMessage("Usage", "xUnit1033:Test classes decorated with 'Xunit.IClassFixture<TFixture>' or 'Xunit.ICollectionFixture<TFixture>' should add a constructor argument of type TFixture", Justification = "Injected via DI")]
 public class ClassFixtureViaRequiredPropertyTest : TestsWithClassFixtureBase
 {
     [Fact]
