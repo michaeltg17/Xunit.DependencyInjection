@@ -8,7 +8,7 @@ public abstract class BeforeAfterTest
 {
     /// <summary>
     /// Access to the current fixture cache (class, collection, assembly fixtures).
-    /// Threaded via AsyncLocal from the class/collection/assembly runner scopes.
+    /// Threaded via ThreadStatic from the class/collection/assembly runner scopes.
     /// </summary>
     protected FixtureCache Fixtures => DependencyInjectionContext.Fixtures;
 

@@ -8,6 +8,7 @@ public class FixtureForPropertyInjection(IDependency dependency)
 /// <summary>
 /// Base class declares required property; derived classes have no boilerplate constructors.
 /// </summary>
+[TestCaseOrderer(typeof(TestCaseByMethodNameOrderer))]
 public abstract class TestsWithRequiredFixtureBase : IClassFixture<FixtureForPropertyInjection>
 {
     public required FixtureForPropertyInjection Fixture { get; set; }
@@ -42,6 +43,8 @@ public class CollectionForPropertyInjection : ICollectionFixture<FixtureForPrope
 public abstract class CollectionFixtureViaRequiredBase
 {
     public required FixtureForPropertyInjection Fixture { get; set; }
+
+    internal static FixtureForPropertyInjection? _first;
 }
 
 [Collection(nameof(CollectionForPropertyInjection))]
@@ -56,8 +59,8 @@ public class CollectionFixtureViaRequiredPropertyTest_A : CollectionFixtureViaRe
     [Fact]
     public void CollectionFixtureState_A()
     {
-        Assert.Equal(0, Fixture.Dependency.Value);
-        Fixture.Dependency.Value = 7777;
+        var previous = Interlocked.CompareExchange(ref _first, Fixture, null);
+        Assert.True(previous == null || ReferenceEquals(previous, Fixture));
     }
 }
 
@@ -65,7 +68,11 @@ public class CollectionFixtureViaRequiredPropertyTest_A : CollectionFixtureViaRe
 public class CollectionFixtureViaRequiredPropertyTest_B : CollectionFixtureViaRequiredBase
 {
     [Fact]
-    public void CollectionFixtureState_B() => Assert.Equal(7777, Fixture.Dependency.Value);
+    public void CollectionFixtureState_B()
+    {
+        var previous = Interlocked.CompareExchange(ref _first, Fixture, null);
+        Assert.True(previous == null || ReferenceEquals(previous, Fixture));
+    }
 }
 
 /// <summary>
