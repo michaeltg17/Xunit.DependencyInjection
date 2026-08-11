@@ -10,4 +10,5 @@ public static class Fixtures
     public class FixtureForAssembly(IDependency dependency) : Fixture(dependency) { }
     public class FixtureForCollection(IDependency dependency) : Fixture(dependency) { }
     public class FixtureForClass(IDependency dependency) : Fixture(dependency) { }
+    public class FixtureForMixed(IDependency dependency) : Fixture(dependency) { }
 }
