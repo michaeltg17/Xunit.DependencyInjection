@@ -10,7 +10,7 @@ public class MixedCollectionFixtures : ICollectionFixture<FixtureForCollection>;
 
 [Collection(nameof(MixedCollectionFixtures))]
 [SuppressMessage("Usage", "xUnit1033:Test classes decorated with 'Xunit.IClassFixture<TFixture>' or 'Xunit.ICollectionFixture<TFixture>' should add a constructor argument of type TFixture", Justification = "Injected via DI")]
-public class MixedFixturePropertyTest : IClassFixture<FixtureForClass>
+public class MixedDifferentTypesFixturePropertyTests : IClassFixture<FixtureForClass>
 {
     public required FixtureForAssembly AssemblyFixture { get; set; }
     public required FixtureForCollection CollectionFixture { get; set; }
