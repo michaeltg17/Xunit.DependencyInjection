@@ -107,5 +107,5 @@ public sealed class MethodDataAttribute(string methodName, params object?[] para
         return param;
     }
 
-    public override bool SupportsDiscoveryEnumeration() => false;
+    public override bool SupportsDiscoveryEnumeration() => true;
 }
