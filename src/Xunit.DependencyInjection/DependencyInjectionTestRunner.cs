@@ -35,7 +35,7 @@ public class DependencyInjectionTestRunner(
                 value = TestContext.Current.TestOutputHelper;
             else if (propertyInfo.PropertyType == typeof(CancellationToken))
                 value = ctxt.CancellationTokenSource.Token;
-            else if (DependencyInjectionContext.Fixtures.TryGet(propertyInfo.PropertyType, out var fixture))
+            else if (DependencyInjectionContext.FixtureCache.TryGet(propertyInfo.PropertyType, out var fixture))
                 value = fixture;
             else
                 value = provider.GetRequiredService(propertyInfo.PropertyType);

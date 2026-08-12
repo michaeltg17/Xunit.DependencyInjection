@@ -24,7 +24,7 @@ public class BeforeAfterFixtureInjector : BeforeAfterTest
     public override void Before(object? testClassInstance, MethodInfo method)
     {
         if (testClassInstance is BeforeAfterTestFixturePropertyInjectionTest test
-            && Fixtures.TryGet(typeof(FixtureForClass), out var fixture))
+            && FixtureCache.TryGet(typeof(FixtureForClass), out var fixture))
             test.Fixture = (FixtureForClass)fixture;
     }
 

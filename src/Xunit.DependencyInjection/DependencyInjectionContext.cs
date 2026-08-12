@@ -9,7 +9,7 @@ public class DependencyInjectionContext(IHost host, bool disableParallelization)
     /// <summary>
     /// Per-class/collection fixture cache via AsyncLocal. Falls back to shared static for assembly fixtures.
     /// </summary>
-    internal static FixtureCache Fixtures => AsyncLocalFixtures.Value ?? FixtureCache.AssemblySharedFixtures;
+    internal static FixtureCache FixtureCache => AsyncLocalFixtures.Value ?? FixtureCache.AssemblySharedFixtures;
 
     public IHost Host { get; } = host;
 
@@ -29,9 +29,10 @@ public sealed class FixtureCache
     /// <summary>Shared across all threads for assembly fixtures — set by assembly runner.</summary>
     internal static readonly FixtureCache AssemblySharedFixtures = new();
     private IDictionary<Type, object>? _assembly;
-
     IDictionary<Type, object>? _collection;
     IDictionary<Type, object>? _class;
+
+    private FixtureCache() { }
 
     /// <summary>Always writes to the shared assembly fixtures.</summary>
     internal static void SetAssembly(IDictionary<Type, object>? fixtures) => AssemblySharedFixtures._assembly = fixtures;
@@ -41,7 +42,7 @@ public sealed class FixtureCache
     /// <summary>
     /// Tries to get a fixture instance by type. Priority: class > collection > assembly.
     /// </summary>
-    internal bool TryGet(Type fixtureType, [MaybeNullWhen(false)] out object instance)
+    public bool TryGet(Type fixtureType, [MaybeNullWhen(false)] out object instance)
     {
         if (_class?.TryGetValue(fixtureType, out instance) == true) return true;
         if (_collection?.TryGetValue(fixtureType, out instance) == true) return true;
