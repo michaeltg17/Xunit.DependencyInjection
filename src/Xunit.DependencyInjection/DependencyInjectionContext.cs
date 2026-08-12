@@ -7,7 +7,7 @@ public class DependencyInjectionContext(IHost host, bool disableParallelization)
     private static readonly AsyncLocal<FixtureCache?> AsyncLocalFixtures = new();
 
     /// <summary>
-    /// Per-collection fixture cache via AsyncLocal. Falls back to shared static for assembly fixtures.
+    /// Per-class/collection fixture cache via AsyncLocal. Falls back to shared static for assembly fixtures.
     /// </summary>
     internal static FixtureCache Fixtures => AsyncLocalFixtures.Value ?? FixtureCache.AssemblySharedFixtures;
 
@@ -20,8 +20,8 @@ public class DependencyInjectionContext(IHost host, bool disableParallelization)
 
 /// <summary>
 /// Holds fixture instances for resolving <c>[Required]</c> properties.
-/// Assembly fixtures are shared via a static field; collection/class are per-runner via AsyncLocal,
-/// so that parallel collections get their own isolation for collection/class fixtures while
+/// Assembly fixtures are shared via a static field; class/collection are per-runner via AsyncLocal,
+/// so that parallel collections get their own isolation for class/collection fixtures while
 /// assembly fixtures are visible from all threads.
 /// </summary>
 public sealed class FixtureCache
