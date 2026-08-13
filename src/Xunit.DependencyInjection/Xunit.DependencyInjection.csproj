@@ -36,6 +36,7 @@ Release notes:
     <InternalsVisibleTo Include="Xunit.DependencyInjection.FsCheck" />
     <InternalsVisibleTo Include="Xunit.DependencyInjection.StaFact" />
     <InternalsVisibleTo Include="Xunit.DependencyInjection.Test" />
+    <InternalsVisibleTo Include="Xunit.DependencyInjection.Test.Parallelization" />
 
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" />

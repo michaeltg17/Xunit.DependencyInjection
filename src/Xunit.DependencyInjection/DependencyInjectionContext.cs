@@ -1,12 +1,55 @@
-﻿namespace Xunit.DependencyInjection;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Xunit.DependencyInjection;
 
 public class DependencyInjectionContext(IHost host, bool disableParallelization)
 {
+    private static readonly AsyncLocal<FixtureCache?> AsyncLocalFixtures = new();
+
+    /// <summary>
+    /// Per-class/collection fixture cache via AsyncLocal. Falls back to shared static for assembly fixtures.
+    /// </summary>
+    internal static FixtureCache FixtureCache => AsyncLocalFixtures.Value ?? FixtureCache.AssemblySharedFixtures;
+
     public IHost Host { get; } = host;
 
     public IServiceProvider RootServices => Host.Services;
 
     public bool DisableParallelization { get; } = disableParallelization;
+}
+
+/// <summary>
+/// Holds fixture instances for resolving <c>[Required]</c> properties.
+/// Assembly fixtures are shared via a static field; class/collection are per-runner via AsyncLocal,
+/// so that parallel collections get their own isolation for class/collection fixtures while
+/// assembly fixtures are visible from all threads.
+/// </summary>
+public sealed class FixtureCache
+{
+    /// <summary>Shared across all threads for assembly fixtures — set by assembly runner.</summary>
+    internal static readonly FixtureCache AssemblySharedFixtures = new();
+    private IDictionary<Type, object>? _assembly;
+    IDictionary<Type, object>? _collection;
+    IDictionary<Type, object>? _class;
+
+    private FixtureCache() { }
+
+    /// <summary>Always writes to the shared assembly fixtures.</summary>
+    internal static void SetAssembly(IDictionary<Type, object>? fixtures) => AssemblySharedFixtures._assembly = fixtures;
+    internal void SetCollection(IDictionary<Type, object>? fixtures) => _collection = fixtures;
+    internal void SetClass(IDictionary<Type, object>? fixtures) => _class = fixtures;
+
+    /// <summary>
+    /// Tries to get a fixture instance by type. Priority: class > collection > assembly.
+    /// </summary>
+    public bool TryGet(Type fixtureType, [MaybeNullWhen(false)] out object instance)
+    {
+        if (_class?.TryGetValue(fixtureType, out instance) == true) return true;
+        if (_collection?.TryGetValue(fixtureType, out instance) == true) return true;
+        if (AssemblySharedFixtures._assembly?.TryGetValue(fixtureType, out instance) == true) return true;
+        instance = default;
+        return false;
+    }
 }
 
 public class DependencyInjectionBuildContext(IHost host, bool disableParallelization) : DependencyInjectionContext(host, disableParallelization)

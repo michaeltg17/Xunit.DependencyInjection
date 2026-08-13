@@ -7,6 +7,11 @@
 public abstract class BeforeAfterTest
 {
     /// <summary>
+    /// Access to the current fixture cache (class, collection, assembly fixtures).
+    /// </summary>
+    public FixtureCache FixtureCache => DependencyInjectionContext.FixtureCache;
+
+    /// <summary>
     /// This method is called after the test method is executed.
     /// </summary>
     /// <param name="testClassInstance">The instance of test class</param>

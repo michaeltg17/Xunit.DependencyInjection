@@ -119,6 +119,8 @@ public class DependencyInjectionTestCollectionRunner(
 
                 await ctxt.CollectionFixtureMappings.CreateFixtures(ctxt.TestCollection.CollectionFixtureTypes,
                     ctxt.Aggregator, serviceScope.ServiceProvider);
+
+                DependencyInjectionContext.FixtureCache.SetCollection(ctxt.CollectionFixtureMappings.GetFixtureCache());
             }
         }
 
@@ -129,6 +131,8 @@ public class DependencyInjectionTestCollectionRunner(
     protected override async ValueTask<bool> OnTestCollectionFinished(DependencyInjectionTestCollectionRunnerContext ctxt,
         RunSummary summary)
     {
+        DependencyInjectionContext.FixtureCache.SetCollection(null);
+
         if (_serviceScope is not { } disposable)
             return await base.OnTestCollectionFinished(ctxt, summary);
 

@@ -20,6 +20,7 @@ public class Startup
             .AddScoped<IDependency, DependencyClass>()
             .AddScoped<IDependencyWithManagedLifetime, DependencyWithManagedLifetime>()
             .AddScoped<BeforeAfterTest, TestBeforeAfterTest>()
+            .AddScoped<BeforeAfterTest, FixturePropertyInjection.BeforeAfterFixtureInjector>()
             .AddHostedService<HostServiceTest>()
             .AddFsCheckSupport()
             .AddStaFactSupport()

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace Xunit.DependencyInjection;
@@ -11,6 +12,7 @@ public class DependencyInjectionTestRunner(
 {
     private static readonly ConcurrentDictionary<Type, PropertyInfo[]> HasRequiredMembers = [];
 
+    [SuppressMessage("Style", "IDE0045:Convert to conditional expression", Justification = "Cleaner")]
     protected override async
         ValueTask<(object? Instance, SynchronizationContext? SyncContext, ExecutionContext? ExecutionContext)>
         CreateTestClassInstance(XunitTestRunnerContext ctxt)
@@ -27,11 +29,19 @@ public class DependencyInjectionTestRunner(
         var provider = ((DependencyInjectionTestRunnerContext)ctxt).Provider;
 
         foreach (var propertyInfo in properties)
-            propertyInfo.SetValue(testClassInstance, propertyInfo.PropertyType == typeof(ITestOutputHelper)
-                ? TestContext.Current.TestOutputHelper
-                : propertyInfo.PropertyType == typeof(CancellationToken)
-                    ? ctxt.CancellationTokenSource.Token
-                    : provider.GetRequiredService(propertyInfo.PropertyType));
+        {
+            object? value;
+            if (propertyInfo.PropertyType == typeof(ITestOutputHelper))
+                value = TestContext.Current.TestOutputHelper;
+            else if (propertyInfo.PropertyType == typeof(CancellationToken))
+                value = ctxt.CancellationTokenSource.Token;
+            else if (DependencyInjectionContext.FixtureCache.TryGet(propertyInfo.PropertyType, out var fixture))
+                value = fixture;
+            else
+                value = provider.GetRequiredService(propertyInfo.PropertyType);
+
+            propertyInfo.SetValue(testClassInstance, value);
+        }
 
         return (testClassInstance, syncContext, executionContext);
     }

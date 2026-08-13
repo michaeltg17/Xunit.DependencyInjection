@@ -43,7 +43,7 @@ internal static class TestHelper
 
     extension(FixtureMappingManager manager)
     {
-        private IDictionary<Type, object> GetFixtureCache()
+        internal IDictionary<Type, object> GetFixtureCache()
         {
             var field =
                 typeof(FixtureMappingManager).GetField("fixtureCache", BindingFlags.Instance | BindingFlags.NonPublic) ??

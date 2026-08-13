@@ -30,6 +30,8 @@ public class DependencyInjectionTestClassRunner(DependencyInjectionTestContext c
 
             await ctxt.ClassFixtureMappings.CreateFixtures(ctxt.TestClass.ClassFixtureTypes, ctxt.Aggregator,
                 serviceScope.ServiceProvider);
+
+            DependencyInjectionContext.FixtureCache.SetClass(ctxt.ClassFixtureMappings.GetFixtureCache());
         }
 
         return await base.OnTestClassStarting(ctxt);
@@ -37,6 +39,8 @@ public class DependencyInjectionTestClassRunner(DependencyInjectionTestContext c
 
     protected override async ValueTask<bool> OnTestClassFinished(XunitTestClassRunnerContext ctxt, RunSummary summary)
     {
+        DependencyInjectionContext.FixtureCache.SetClass(null);
+
         if (_serviceScope is not { } disposable)
             return await base.OnTestClassFinished(ctxt, summary);
 
